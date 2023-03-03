@@ -3,7 +3,6 @@ version: '3'
 networks:
   laravel:
 
-
 services:
   app:
     build:
@@ -47,6 +46,8 @@ services:
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
+    environment:
+      - APP_ENV=${APP_ENV}
     ports:
       - "9000:9000"
     volumes:
