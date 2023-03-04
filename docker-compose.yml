@@ -38,6 +38,8 @@ services:
       SERVICE_NAME: mysql
     networks:
       - laravel
+    volumes:
+      - ./mysql:/var/lib/mysql
 
   php:
     build:
@@ -70,6 +72,8 @@ services:
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
+    environment:
+      - APP_ENV=${APP_ENV}
     volumes:
       - ./src:/var/www/html
     depends_on:
@@ -98,6 +102,8 @@ services:
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
+    environment:
+      - APP_ENV=${APP_ENV}
     volumes:
       - ./src:/var/www/html:delegated
     depends_on:
