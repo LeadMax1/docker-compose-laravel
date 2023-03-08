@@ -11,20 +11,40 @@ services:
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
+    container_name: nginx
     ports:
       - "80:80"
     volumes:
       - ./src:/var/www/html:delegated
     depends_on:
       - php
-      - redis
       - mysql
-      - mailhog
+#      - redis
+#      - mailhog
+      - dynamodb-local
+    networks:
+      - laravel
+
+  php:
+    build:
+      context: ./dockerfiles
+      dockerfile: php.dockerfile
+      args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
+    container_name: php
+    environment:
+      - APP_ENV=${APP_ENV}
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./src:/var/www/html:delegated
     networks:
       - laravel
 
   mysql:
     image: mysql:8
+    container_name: mysql
     restart: unless-stopped
     tty: true
     ports:
@@ -41,24 +61,9 @@ services:
     volumes:
       - ./mysql:/var/lib/mysql
 
-  php:
-    build:
-      context: ./dockerfiles
-      dockerfile: php.dockerfile
-      args:
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
-    environment:
-      - APP_ENV=${APP_ENV}
-    ports:
-      - "9000:9000"
-    volumes:
-      - ./src:/var/www/html:delegated
-    networks:
-      - laravel
-
   redis:
     image: redis:alpine
+    container_name: redis
     restart: unless-stopped
     ports:
       - "6379:6379"
@@ -72,6 +77,7 @@ services:
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
+    container_name: composer
     environment:
       - APP_ENV=${APP_ENV}
     volumes:
@@ -84,6 +90,7 @@ services:
 
   npm:
     image: node:current-alpine
+    container_name: npm
     volumes:
       - ./src:/var/www/html
     ports:
@@ -102,6 +109,7 @@ services:
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
+    container_name: artisan
     environment:
       - APP_ENV=${APP_ENV}
     volumes:
@@ -114,8 +122,21 @@ services:
 
   mailhog:
     image: mailhog/mailhog:latest
+    container_name: mailhog
     ports:
       - "1025:1025"
       - "8025:8025"
+    networks:
+      - laravel
+
+  dynamodb-local:
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: amazon/dynamodb-local:latest
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./dynamodb:/home/dynamodblocal/data
+    working_dir: /home/dynamodblocal
     networks:
       - laravel
