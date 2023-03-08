@@ -70,24 +70,6 @@ services:
     networks:
       - laravel
 
-  composer:
-    build:
-      context: ./dockerfiles
-      dockerfile: php.dockerfile
-      args:
-        - UID=${UID:-1000}
-        - GID=${GID:-1000}
-    container_name: composer
-    environment:
-      - APP_ENV=${APP_ENV}
-    volumes:
-      - ./src:/var/www/html
-    depends_on:
-      - php
-    entrypoint: [ 'composer', '--ignore-platform-reqs' ]
-    networks:
-      - laravel
-
   npm:
     image: node:current-alpine
     container_name: npm
@@ -117,6 +99,24 @@ services:
     depends_on:
       - mysql
     entrypoint: [ 'php', '/var/www/html/artisan' ]
+    networks:
+      - laravel
+
+  composer:
+    build:
+      context: ./dockerfiles
+      dockerfile: php.dockerfile
+      args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
+    container_name: composer
+    environment:
+      - APP_ENV=${APP_ENV}
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - php
+    entrypoint: [ 'composer', '--ignore-platform-reqs' ]
     networks:
       - laravel
 
