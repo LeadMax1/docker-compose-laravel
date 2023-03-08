@@ -20,7 +20,7 @@ services:
       - php
       - mysql
 #      - redis
-#      - mailhog
+      - mailpit
       - dynamodb-local
     networks:
       - laravel
@@ -120,9 +120,9 @@ services:
     networks:
       - laravel
 
-  mailhog:
-    image: mailhog/mailhog:latest
-    container_name: mailhog
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: mailpit
     ports:
       - "1025:1025"
       - "8025:8025"
